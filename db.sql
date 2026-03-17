@@ -1,12 +1,16 @@
 -- TurboSol Faucet database schema for MySQL/MariaDB (phpMyAdmin import)
 
--- Upgrade helpers for existing installations (old schema without email/levels)
+-- Upgrade helpers for existing installations (old schema without email/levels/ads)
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(190) DEFAULT NULL AFTER id;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS total_claims INT UNSIGNED DEFAULT 0 AFTER balance;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS level INT UNSIGNED DEFAULT 1 AFTER total_claims;
 CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_level ON users(level);
 CREATE INDEX IF NOT EXISTS idx_users_total_claims ON users(total_claims);
+
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS ad_horizontal_url VARCHAR(500) DEFAULT NULL AFTER faucet_active;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS ad_vertical_left_url VARCHAR(500) DEFAULT NULL AFTER ad_horizontal_url;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS ad_vertical_right_url VARCHAR(500) DEFAULT NULL AFTER ad_vertical_left_url;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -46,7 +50,10 @@ CREATE TABLE IF NOT EXISTS settings (
     claim_interval_minutes INT DEFAULT 30,
     min_amount DECIMAL(18,9) DEFAULT 0.00005,
     max_amount DECIMAL(18,9) DEFAULT 0.0003,
-    faucet_active TINYINT(1) DEFAULT 1
+    faucet_active TINYINT(1) DEFAULT 1,
+    ad_horizontal_url VARCHAR(500) DEFAULT NULL,
+    ad_vertical_left_url VARCHAR(500) DEFAULT NULL,
+    ad_vertical_right_url VARCHAR(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Performance indexes
@@ -69,7 +76,7 @@ CREATE INDEX idx_logs_created_at ON logs(created_at);
 -- Default settings row
 INSERT IGNORE INTO settings (id) VALUES (1);
 
--- Instrukce:
--- 1. Vytvoř DB na InfinityFree.
--- 2. Importuj tento sql v phpMyAdmin.
--- 3. Uprav config.php s DB údaji.
+-- Instructions:
+-- 1. Create DB on InfinityFree.
+-- 2. Import this SQL in phpMyAdmin.
+-- 3. Update config.php with DB credentials.
