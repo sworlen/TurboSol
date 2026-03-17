@@ -1,5 +1,13 @@
 -- TurboSol Faucet database schema for MySQL/MariaDB (phpMyAdmin import)
 
+-- Upgrade helpers for existing installations (old schema without email/levels)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(190) DEFAULT NULL AFTER id;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS total_claims INT UNSIGNED DEFAULT 0 AFTER balance;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS level INT UNSIGNED DEFAULT 1 AFTER total_claims;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_level ON users(level);
+CREATE INDEX IF NOT EXISTS idx_users_total_claims ON users(total_claims);
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(190) NOT NULL UNIQUE,
