@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('claimForm');
-    const walletInput = form ? form.querySelector('input[name="wallet"]') : null;
+    const emailInput = form ? form.querySelector('input[name="email"]') : null;
     const claimButton = document.getElementById('claimButton');
 
-    if (!form || !walletInput || !claimButton) {
+    if (!form || !emailInput || !claimButton) {
         return;
     }
 
@@ -35,37 +35,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const timerId = setInterval(function () {
             seconds -= 1;
-
             if (seconds <= 0) {
                 clearInterval(timerId);
                 claimButton.disabled = false;
                 countdownEl.textContent = '';
                 return;
             }
-
             countdownEl.textContent = `Další claim za ${formatTime(seconds)}`;
         }, 1000);
     }
 
-    const wallet = walletInput.value.trim();
-    if (wallet === '') {
+    const email = emailInput.value.trim();
+    if (!email) {
         return;
     }
 
-    fetch(`timer.php?wallet=${encodeURIComponent(wallet)}`)
-        .then(function (response) {
+    fetch(`timer.php?email=${encodeURIComponent(email)}`)
+        .then((response) => {
             if (!response.ok) {
                 throw new Error('Timer request failed');
             }
             return response.json();
         })
-        .then(function (data) {
+        .then((data) => {
             const remaining = Number(data && data.remaining_seconds ? data.remaining_seconds : 0);
             if (remaining > 0) {
                 startCountdown(remaining);
             }
         })
-        .catch(function () {
-            // Intentionally silent; countdown is optional UX improvement.
+        .catch(() => {
+            // no-op
         });
 });

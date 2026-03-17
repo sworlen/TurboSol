@@ -2,13 +2,15 @@
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    wallet_address VARCHAR(44) NOT NULL UNIQUE,
+    email VARCHAR(190) NOT NULL UNIQUE,
     faucetpay_id VARCHAR(100) NOT NULL,
     ip VARCHAR(45) DEFAULT NULL,
     referral_code VARCHAR(12) DEFAULT NULL UNIQUE,
     referred_by VARCHAR(12) DEFAULT NULL,
     last_claim DATETIME DEFAULT NULL,
     balance DECIMAL(18,9) DEFAULT 0,
+    total_claims INT UNSIGNED DEFAULT 0,
+    level INT UNSIGNED DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -40,14 +42,19 @@ CREATE TABLE IF NOT EXISTS settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Performance indexes
+CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_last_claim ON users(last_claim);
 CREATE INDEX idx_users_created_at ON users(created_at);
 CREATE INDEX idx_users_referral_code ON users(referral_code);
 CREATE INDEX idx_users_referred_by ON users(referred_by);
+CREATE INDEX idx_users_level ON users(level);
+CREATE INDEX idx_users_total_claims ON users(total_claims);
+
 CREATE INDEX idx_claims_user_id ON claims(user_id);
 CREATE INDEX idx_claims_ip_created_at ON claims(ip, created_at);
 CREATE INDEX idx_claims_status ON claims(status);
 CREATE INDEX idx_claims_created_at ON claims(created_at);
+
 CREATE INDEX idx_logs_action ON logs(action);
 CREATE INDEX idx_logs_created_at ON logs(created_at);
 
